@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  prompt-router:
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
