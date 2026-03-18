@@ -1,38 +1,44 @@
 require('dotenv').config();
-const express = require('express');
+const readline = require('readline');
 const { classifyIntent, routeAndRespond } = require('./router');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-    res.json({ status: 'Prompt Router service is running!' });
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
 });
 
-app.post('/api/route', async (req, res) => {
-    try {
-        const { message } = req.body;
+console.log("Prompt Router service is running in CLI mode!");
+console.log("Type your message below (or type 'exit' to quit):\n");
 
-        if (!message) {
-            return res.status(400).json({ error: 'Please provide a "message" field in the JSON body.' });
+function askQuestion() {
+    rl.question('You: ', async (message) => {
+        if (message.trim().toLowerCase() === 'exit' || message.trim().toLowerCase() === 'quit') {
+            console.log('Exiting...');
+            rl.close();
+            return;
         }
 
-        const intentData = await classifyIntent(message);
-        const finalResponse = await routeAndRespond(message, intentData);
+        if (!message.trim()) {
+            console.log('System: Please provide a valid message.\n');
+            askQuestion();
+            return;
+        }
 
-        res.json({
-            original_message: message,
-            classification: intentData,
-            response: finalResponse
-        });
-    } catch (error) {
-        console.error("Server error:", error);
-        res.status(500).json({ error: 'Internal server error.' });
-    }
-});
+        try {
+            const intentData = await classifyIntent(message);
+            const finalResponse = await routeAndRespond(message, intentData);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+            console.log('\n--- Result ---');
+            console.log(`Intent: ${intentData.intent}`);
+            console.log(`Confidence: ${intentData.confidence}`);
+            console.log(`Response:\n${finalResponse}`);
+            console.log('--------------\n');
+        } catch (error) {
+            console.error("System Error:", error);
+        }
+
+        askQuestion();
+    });
+}
+
+askQuestion();
