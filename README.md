@@ -44,3 +44,6 @@ Ensure you have Node.js (v18+) installed.
 - **Two-Step Architecture**: We decouple intent detection from generation. The intent detection uses `llama-3.1-8b-instant` with `temperature=0.0` through Groq for highly deterministic, ultra-fast, JSON-only outputs. 
 - **Robustness**: The classifier safely catches `JSON.parse` errors to default to `unclear` intent. It also strips potential markdown code blocks like ```json ... ``` from the LLM response to ensure clean JSON parsing.
 - **Logging**: `route_log.jsonl` provides strong observability across all requests in a machine-readable format.
+
+## Video Demonstration
+[Watch the demo on YouTube](https://www.youtube.com/watch?v=eLH0wbHCXng)
